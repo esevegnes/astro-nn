@@ -214,6 +214,17 @@ class MMS_Dataset(Dataset):
     def to_dataframe(self):
         return(pd.DataFrame(data=self.values,index=self.index,columns=self.columns))
 
+    def exclude(self,t1_ex,t2_ex):
+        # Build boolean mask (works for pandas Index or numpy array)
+        keep_mask = (self.index < t1_ex) | (self.index > t2_ex)
+
+        # Ensure numpy boolean array
+        keep_mask_np = np.asarray(keep_mask, dtype=bool)
+
+        # Apply mask to tensor and index
+        self.values = self.values[torch.from_numpy(keep_mask_np)]
+        self.index = self.index[keep_mask_np]
+        return self
 #### Scalers
 class Standard_Scaler(Dataset):
     def __init__(self,dataset):
